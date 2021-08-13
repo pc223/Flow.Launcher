@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using JetBrains.Annotations;
 using Microsoft.IO;
 using System.Text.RegularExpressions;
+using NuGet;
 
 namespace Flow.Launcher.Core.Plugin
 {
@@ -217,8 +219,24 @@ namespace Flow.Launcher.Core.Plugin
                     Log.Error("|JsonRPCPlugin.ExecuteAsync|Can't start new process");
                     return Stream.Null;
                 }
+                
+                
+                
 
-                await using var source = process.StandardOutput.BaseStream;
+                // await using var source = process.StandardOutput.BaseStream;
+                await using var mySource = process.StandardOutput.BaseStream; 
+                
+                var debugOuput = mySource.ReadToEnd();
+                Log.Debug($"|JsonRPCPlugin.ExecuteAsync|result:<{debugOuput}>");
+                
+                
+                var bytesOutput = Encoding.UTF8.GetBytes(debugOuput);
+                
+                await using var source = new MemoryStream(bytesOutput);
+                
+               
+                
+                
 
                 var buffer = BufferManager.GetStream();
 
